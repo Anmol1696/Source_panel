@@ -10,6 +10,9 @@ import numpy as np
 
 from source_panel import get_panels
 
+def V_infinity(time):
+    return 5 * abs(cos(time))
+
 def get_I_ij(panel_i, panel_j, alpha):
     """
         This will contain the equation
@@ -77,7 +80,7 @@ def get_sum_lambda_S(lambdas, panels):
 
     for i in range(len(panels)):
         S_i = ((panels[i][0][0] - panels[i][1][0])**2 + (panels[i][0][1] - panels[i][1][1])**2)**0.5
-        sum_lambda_S += lambdas[i] * S_i
+        sum_lambda_S += lambdas[i] * S_i * 2 * pi * V_infinity(0)
 
     return sum_lambda_S
 
@@ -87,7 +90,7 @@ def main():
     """
     panels = get_panels(a = 20, b = 10, num_panels = 52, plot = False)
 
-    x = solve_for_lambda(panels, alpha = 30)
+    x = solve_for_lambda(panels, alpha = 0)
 
     print x
     print 'Len of x -> ', len(x)
