@@ -53,30 +53,32 @@ def get_matrixs(panels, alpha):
     """
 
     I_matrix    = [[0 for _ in range(len(panels))] for _ in range(len(panels))]
-    cos_matrix  = [0 for _ in range(len(panels))]
+    beta_i_matrix  = [0 for _ in range(len(panels))]
 
     for i in range(len(panels)):
         for j in range(len(panels)):
             if i == j:
                 I_matrix[i][j] = pi
             else:
-                I_ij, phi_i = get_I_ij(panels[i], panels[j], alpha)
+                I_ij, phi_i = get_I_ij_or_I_vs(panels[i], panels[j], alpha, 'I_ij')
                 I_matrix[i][j] = I_ij
-                if cos_matrix[i] == 0:
-                    cos_matrix[i] = cos(phi_i + (pi/2.0) - (alpha*pi/180.0))
+                if beta_i_matrix[i] == 0:
+                    beta_i_matrix[i] = (phi_i + (pi/2.0) - (alpha*pi/180.0))
 
 
-    return np.array(I_matrix), np.array(cos_matrix)
+    return np.array(I_matrix), np.array(beta_i_matrix)
 
-def solve_for_lambda(panels, alpha):
+def solve_for_lambda(I_matrix, beta_i_matrix):
     """
         alpha is in degree
         here x = lambda_i/2*pi*V_infinity
     """
     
-    I_matrix, cos_matrix = get_matrixs(panels, alpha)
+    #I_matrix, cos_matrix = get_matrixs(panels, alpha)
+    print "I_matrix -> ", I_matrix
+    print "cos_matrix -> ", beta_i_matrix
 
-    x = np.linalg.solve(I_matrix, cos_matrix)
+    x = np.linalg.solve(I_matrix, map(cos, beta_i_matrix))
 
     return x
 
@@ -92,16 +94,29 @@ def get_sum_lambda_S(lambdas, panels):
 
     return sum_lambda_S
 
-def 
+def get_V_i(lambda_v_infi):
+    """
+        lambda_v_infi is the result of solve_for lambda, lambda_i/2*pi*V_infinity
+    """
+    len_lambdas = len(lambda_v_infi)
+
+    for i in range(len_lambdas):
+        for j in range(len_lambdas):
+            if j != i:
+                continue
+
+
 
 def main():
     """
         Main function
         alpha in degree
     """
+    alpha = 30
     panels = get_panels(a = 20, b = 10, num_panels = 52, plot = False)
+    I_matrix, beta_i_matrix = get_matrixs(panels, alpha)
 
-    x = solve_for_lambda(panels, alpha = 30)
+    x = solve_for_lambda(I_matrix, beta_i_matrix)
 
     print x
     print 'Len of x -> ', len(x)
