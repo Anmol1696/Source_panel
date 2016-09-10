@@ -23,8 +23,8 @@ def get_panels(a, b, num_panels, plot):
     x1, y1 = 20.0, 0.0
     for i in range(n):
         sum_theta = ((i + 1)/2.0)*((2.0*theta) + i)
-        x2 = a*cos(sum_theta*pi/180)
-        y2 = b*sin(sum_theta*pi/180)
+        x2 = round(a*cos(sum_theta*pi/180), 5)
+        y2 = round(b*sin(sum_theta*pi/180), 5)
         
         panels.append([(x2, y2), (x1, y1)])
 
@@ -58,7 +58,7 @@ def get_panels(a, b, num_panels, plot):
     return panels
 
 if __name__ == '__main__':
-    panels = get_panels(20, 10, num_panels = 52, plot = True)
+    panels = get_panels(20, 10, num_panels = 10, plot = True)
 
     print panels
     print 'Len of panels -> ', len(panels)
