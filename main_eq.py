@@ -3,7 +3,7 @@
 """
 
 from sympy  import Symbol
-from math   import sin, cos, pi, atan
+from math   import sin, cos, pi, atan2
 from math   import log as ln
 
 import numpy as np
@@ -13,17 +13,19 @@ from source_panel import get_panels
 def V_infinity(time):
     return 5 * abs(cos(time))
 
-def get_I_ij(panel_i, panel_j, alpha):
+def get_I_ij_or_I_vs(panel_i, panel_j, alpha, which_I):
     """
         This will contain the equation
         panel_i/j will have [(X_i+1, Y_i+1), (X_i, Y_i)] and same for j
         alpha should be in degrees
+        I_vs is the integral used for calculating V_s for a given pannel
+        which_I is either I_ij or I_vs
     """
     
     alpha = (alpha * pi) / 180.0
 
-    phi_i = atan((panel_i[0][1] - panel_i[1][1])/(panel_i[0][0] - panel_i[1][0]))
-    phi_j = atan((panel_j[0][1] - panel_j[1][1])/(panel_j[0][0] - panel_j[1][0]))
+    phi_i = atan2((panel_i[0][1] - panel_i[1][1]), (panel_i[0][0] - panel_i[1][0]))
+    phi_j = atan2((panel_j[0][1] - panel_j[1][1]), (panel_j[0][0] - panel_j[1][0]))
 
     x_i, y_i = (panel_i[0][0] - panel_i[1][0])/2, (panel_i[0][1] - panel_i[1][1])/2
 
@@ -34,9 +36,15 @@ def get_I_ij(panel_i, panel_j, alpha):
     S_j = ((panel_j[0][0] - panel_j[1][0])**2 + (panel_j[0][1] - panel_j[1][1])**2)**0.5
     E   = (B - A**2)**0.5
 
-    I_ij = (C/2)*ln((S_j**2 + (2.0*A*S_j) + B)/B) + ((D - (A*C))/E)*(atan((S_j + A)/E) - atan(A/E))
-
-    return I_ij, phi_i
+    if which_I == 'I_ij':
+        I_ij = (C/2)*ln((S_j**2 + (2.0*A*S_j) + B)/B) + ((D - (A*C))/E)*(atan2((S_j + A), E) - atan2(A, E))
+        return I_ij, phi_i
+    elif which_I == 'I_vs':
+        I_vs = (((D - (A*C))/(2*E))*ln((S_j**2 + (2*A*S_j))/B)) - (C * (atan2(S_j + A, E) - atan2(A, E)))
+        return I_vs
+    else:
+        print '[ERROR] NO I mentioned from I_ij and I_vs'
+        return 0
 
 def get_matrixs(panels, alpha):
     """
@@ -84,13 +92,16 @@ def get_sum_lambda_S(lambdas, panels):
 
     return sum_lambda_S
 
+def 
+
 def main():
     """
         Main function
+        alpha in degree
     """
     panels = get_panels(a = 20, b = 10, num_panels = 52, plot = False)
 
-    x = solve_for_lambda(panels, alpha = 0)
+    x = solve_for_lambda(panels, alpha = 30)
 
     print x
     print 'Len of x -> ', len(x)
