@@ -145,7 +145,7 @@ def main():
         alpha in degree
         Lambda_norm is lambda/2*pi*V_infinity
     """
-    alpha = 0
+    alpha = 30.0
     a = 20.0
     b = 10.0
     panels = get_panels(a, b, num_panels = 52, plot = False)
