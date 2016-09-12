@@ -202,12 +202,15 @@ def main():
         alpha in degree
         Lambda_norm is lambda/2*pi*V_infinity
     """
-    alpha = 0
-    a = 20.0
-    b = 10.0
-    v_infi = 10
+    from read_sp_csv import panels
 
-    panels = get_panels(a, b, num_panels = 24, plot = False)
+    alpha = 0
+    a = 1
+    b = 2
+    v_infi = 31
+    
+    #panels = get_panels(a, b, num_panels = 24, plot = False)
+
     I_matrix, beta_i_matrix, I_vs_matrix_m, I_vs_matrix_c = get_matrixs(panels, alpha)
 
     m_j_matrix, c_j_matrix = solve_for_lambda(I_matrix, beta_i_matrix, v_infi)
