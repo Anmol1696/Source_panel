@@ -11,9 +11,6 @@ import numpy as np
 from source_panel   import get_panels
 from plot_functions import plot_C_p_vs_x
 
-def V_infinity(time):
-    return 5 * abs(cos(time))
-
 def get_I_ij_or_I_vs(panel_i, panel_j, alpha, which_I):
     """
         This will contain the equation
@@ -96,7 +93,7 @@ def get_sum_lambda_S(lambdas, panels):
 
     for i in range(len(panels)):
         S_i = ((panels[i][0][0] - panels[i][1][0])**2 + (panels[i][0][1] - panels[i][1][1])**2)**0.5
-        sum_lambda_S += lambdas[i] * S_i * 2 * pi * V_infinity(0)
+        sum_lambda_S += lambdas[i] * S_i * 2 * pi * 5
 
     return sum_lambda_S
 
@@ -159,17 +156,15 @@ def main():
 
         V_i_infi_matrix = get_V_i(I_vs_matrix, lambda_norm, beta_i_matrix) 
     
-        #print 'V_i_infi_matrix ->', V_i_infi_matrix
+        print 'V_i_infi_matrix ->', V_i_infi_matrix
     
         C_pi_matrix = get_C_pi(V_i_infi_matrix)
 
         C_l, C_d = get_C_l_and_C_d(a, b, C_pi_matrix, beta_i_matrix, panels)
    
-    #print 'Panels -> ', panels
-    #print 'I_vs_matrxi -> ', I_vs_matrix
-    #print 'Values of lambda -> ',lambda_norm
-    #print 'Len of x -> ', len(lambda_norm)
-    #print 'C_pi_matrix -> ', C_pi_matrix
+        print 'Panels -> ', panels
+        print 'I_vs_matrxi -> ', I_vs_matrix
+        print 'C_pi_matrix -> ', C_pi_matrix
 
         sum_lambda_S = get_sum_lambda_S(lambda_norm, panels)
 
