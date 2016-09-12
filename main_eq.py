@@ -45,13 +45,13 @@ def get_I_ij_or_I_vs(panel_i, panel_j, alpha, which_I):
     elif which_I == 'I_vs':
         C_s = -cos(phi_i - phi_j) 
         D_s = ((y_i - panel_j[1][1])*sin(phi_i)) + ((x_i - panel_j[1][0])*cos(phi_i))
-        P_s = D_s - (2*A*C_s)
-        Q_s = -1 * B * C_s
 
         #I_vs_cj = (((D - (A*C))/(2*E))*ln((S_j**2 + (2*A*S_j) + B)/B)) - (C * (atan((S_j + A)/E) - atan(A/E)))
-        I_vs_cj = ((C_s/2)*ln(((S_j**2 + (2*A*S_j) + B)/B))) + (((D_s - (A*C_s))/E)*(atan((S_j + A)/E) - atan(A/E)))
-        I_vs_mj = (C_s*S_j) + (P_s/2)*ln((S_j**2 + (2*A*S_j) + B)/B) + ((Q_s - (A*P_s))/E)*(atan((S_j + A)/E) - atan(A/E))
-        
+        #I_vs_cj = ((C_s/2)*ln(((S_j**2 + (2*A*S_j) + B)/B))) + (((D_s - (A*C_s))/E)*(atan((S_j + A)/E) - atan(A/E)))
+        I_vs_cj = (C_s/2)*ln((S_j**2 + (2.0*A*S_j) + B)/B) + ((D_s - (A*C_s))/E)*(atan((S_j + A)/E) - atan(A / E))
+        #I_vs_mj = (C_s*S_j) + (P_s/2)*ln((S_j**2 + (2*A*S_j) + B)/B) + ((Q_s - (A*P_s))/E)*(atan((S_j + A)/E) - atan(A/E))
+        I_vs_mj = (C_s*S_j) + ((D - (2*A*C_s))/2)*ln((S_j**2 + (2*S_j*A) + B)/B) - ((B*C) + (A*(D_s - (2*A*C_s))))*(atan((S_j + A)/A) - atan(A/E))
+
         return I_vs_mj, I_vs_cj 
     else:
         print '[ERROR] NO I mentioned from I_ij and I_vs'
@@ -80,7 +80,7 @@ def get_matrixs(panels, alpha):
                 I_matrix_m[i][j]    = S_i*pi/2
                 I_matrix_c[i][j]    = pi
                 #I_vs_matrix_m[i][j] = 2*pi*S_i*(ln(S_i/2)-1)
-                I_vs_matrix_m[i][j] = 0
+                I_vs_matrix_m[i][j] = 2*S_i
                 I_vs_matrix_c[i][j] = 0
             else:
                 I_matrix_m[i][j], I_matrix_c[i][j], phi_i = get_I_ij_or_I_vs(panels[i], panels[j], alpha, 'I_ij')
@@ -118,10 +118,11 @@ def form_I_matrix(I_matrix_m, I_matrix_c, S_i_matrix):
             if i == j:
                 I_matrix[i][j]   = 1
                 if j == (2*num_panels) - 1:
-                    I_matrix[i][0]  = -1
+                    I_matrix[i][num_panels]  = -1
                 else:
-                    I_matrix[i][j+1] = -1
-
+                    I_matrix[i][j + 1] = -1
+    #print 'I_matrix -> ', I_matrix
+    #print 'len I_matrix -> ', len(I_matrix)
     return I_matrix
     
 def solve_for_lambda(I_matrix, beta_i_matrix, v_infi):
@@ -137,7 +138,7 @@ def solve_for_lambda(I_matrix, beta_i_matrix, v_infi):
 
     b_matrix = map(lambda x: v_infi * cos(x) * (-1), beta_i_matrix) + [0]*len(beta_i_matrix)
 
-    x_matrix = np.linalg.solve(map(lambda x: (x/(2*pi)), I_matrix), b_matrix)
+    x_matrix = np.linalg.solve(map(lambda x: (x/(2.0*pi)), I_matrix), b_matrix)
 
     m_j_matrix = x_matrix[:len(beta_i_matrix)]
     c_j_matrix = x_matrix[len(beta_i_matrix):]
@@ -204,7 +205,7 @@ def main():
     alpha = 0
     a = 20.0
     b = 10.0
-    v_infi = 20
+    v_infi = 10
 
     panels = get_panels(a, b, num_panels = 24, plot = False)
     I_matrix, beta_i_matrix, I_vs_matrix_m, I_vs_matrix_c = get_matrixs(panels, alpha)
