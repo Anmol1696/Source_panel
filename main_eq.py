@@ -28,7 +28,7 @@ def get_I_ij_or_I_vs(panel_i, panel_j, alpha, which_I):
     phi_i = atan2((panel_i[0][1] - panel_i[1][1]), (panel_i[0][0] - panel_i[1][0]))
     phi_j = atan2((panel_j[0][1] - panel_j[1][1]), (panel_j[0][0] - panel_j[1][0]))
 
-    x_i, y_i = (panel_i[0][0] - panel_i[1][0])/2, (panel_i[0][1] - panel_i[1][1])/2
+    x_i, y_i = (panel_i[0][0] + panel_i[1][0])/2, (panel_i[0][1] + panel_i[1][1])/2
 
     A   = -(x_i - panel_j[1][0])*cos(phi_j) - (y_i - panel_j[1][1])*sin(phi_j)
     B   = (x_i - panel_j[1][0])**2 + (y_i - panel_j[1][1])**2
