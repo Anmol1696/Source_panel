@@ -14,8 +14,9 @@ def get_panels(a, b, num_panels, plot):
     """
     n = num_panels/4
 
-    panels = []
-    plot_curve = [[], []]
+    sub_panels  = []
+    panels      = []
+    plot_curve  = [[], []]
 
     theta = (90.0/n) - ((n - 1)/2.0)
     print theta 
@@ -26,27 +27,22 @@ def get_panels(a, b, num_panels, plot):
         x2 = round(a*cos(sum_theta*pi/180), 5)
         y2 = round(b*sin(sum_theta*pi/180), 5)
         
-        panels.append([(x2, y2), (x1, y1)])
+        sub_panels.append([(x2, y2), (x1, y1)])
 
         x1, y1 = x2, y2
 
-    for j in range(3):
-        temp_panel = []
-    
+    print 'Print sub_panels ->', sub_panels
+
+    for j in range(4):
         for i in range(n):
             if j == 0:
-                temp_panel.append([(panels[i][0][0] * (-1), panels[i][0][1]), (panels[i][1][0]*(-1), panels[i][1][1])])
+                panels.append([(sub_panels[i][0][0]*(-1), sub_panels[i][0][1]), (sub_panels[i][1][0] * (-1), sub_panels[i][1][1])])
             elif j == 1:
-                temp_panel.append([(panels[i][0][0] * (-1), panels[i][0][1] * (-1)), (panels[i][1][0] * (-1), panels[i][1][1] * (-1))])
+                panels.append(sub_panels[::-1][i][::-1])
             elif j == 2:
-                temp_panel.append([(panels[i][0][0], panels[i][0][1] * (-1)), (panels[i][1][0], panels[i][1][1] * (-1))])
-
-        if not j == 1:
-            temp_panel.reverse()
-            for panel in panels:
-                panel.reverse()
-
-        panels += temp_panel
+                panels.append([(sub_panels[i][0][0], sub_panels[i][0][1] * (-1)), (sub_panels[i][1][0], sub_panels[i][1][1] * (-1))])
+            elif j == 3:
+                panels.append([(sub_panels[::-1][i][1][0] * (-1), sub_panels[::-1][i][1][1] * (-1)), (sub_panels[::-1][i][0][0] * (-1), sub_panels[::-1][i][0][1] * (-1))])
 
     if plot:
         x_points = [panel[0][0] for panel in panels]
@@ -58,7 +54,7 @@ def get_panels(a, b, num_panels, plot):
     return panels
 
 if __name__ == '__main__':
-    panels = get_panels(20, 10, num_panels = 10, plot = True)
+    panels = get_panels(20, 10, num_panels = 16, plot = True)
 
     print panels
     print 'Len of panels -> ', len(panels)

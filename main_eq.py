@@ -3,12 +3,13 @@
 """
 
 from sympy  import Symbol
-from math   import sin, cos, pi, atan2
+from math   import sin, cos, pi, atan2, atan
 from math   import log as ln
 
 import numpy as np
 
-from source_panel import get_panels
+from source_panel   import get_panels
+from plot_functions import plot_C_p_vs_x
 
 def V_infinity(time):
     return 5 * abs(cos(time))
@@ -29,18 +30,18 @@ def get_I_ij_or_I_vs(panel_i, panel_j, alpha, which_I):
 
     x_i, y_i = (panel_i[0][0] - panel_i[1][0])/2, (panel_i[0][1] - panel_i[1][1])/2
 
-    A   = -(x_i - panel_j[1][0])*cos(phi_j - alpha) - (y_i - panel_j[1][1])*sin(phi_j - alpha)
+    A   = -(x_i - panel_j[1][0])*cos(phi_j) - (y_i - panel_j[1][1])*sin(phi_j)
     B   = (x_i - panel_j[1][0])**2 + (y_i - panel_j[1][1])**2
     C   = sin(phi_i - phi_j)
-    D   = (y_i - panel_j[1][1])*cos(phi_i - alpha) - (x_i - panel_j[1][0])*sin(phi_i - alpha)
+    D   = (y_i - panel_j[1][1])*cos(phi_i) - (x_i - panel_j[1][0])*sin(phi_i)
     S_j = ((panel_j[0][0] - panel_j[1][0])**2 + (panel_j[0][1] - panel_j[1][1])**2)**0.5
-    E   = (B - A**2)**0.5
+    E   = (B - (A**2))**0.5
 
     if which_I == 'I_ij':
-        I_ij = (C/2)*ln((S_j**2 + (2.0*A*S_j) + B)/B) + ((D - (A*C))/E)*(atan2((S_j + A), E) - atan2(A, E))
+        I_ij = (C/2)*ln((S_j**2 + (2.0*A*S_j) + B)/B) + ((D - (A*C))/E)*(atan((S_j + A)/E) - atan(A / E))
         return I_ij, phi_i
     elif which_I == 'I_vs':
-        I_vs = (((D - (A*C))/(2*E))*ln((S_j**2 + (2*A*S_j) + B)/B)) - (C * (atan2(S_j + A, E) - atan2(A, E)))
+        I_vs = (((D - (A*C))/(2*E))*ln((S_j**2 + (2*A*S_j) + B)/B)) - (C * (atan((S_j + A)/E) - atan(A/E)))
         return I_vs
     else:
         print '[ERROR] NO I mentioned from I_ij and I_vs'
@@ -67,8 +68,9 @@ def get_matrixs(panels, alpha):
                 I_matrix[i][j] = I_ij
                 I_vs_matrix[i][j] = I_vs
                 if beta_i_matrix[i] == 0:
-                    beta_i_matrix[i] = (phi_i + (pi/2.0) - (alpha*pi/180.0))
-
+                    beta_i_matrix[i] = (phi_i + (pi/2.0) - ((alpha*pi)/180.0))
+                    if beta_i_matrix[i] < 0:
+                        beta_i_matrix[i] += 2*pi
 
     return np.array(I_matrix), np.array(beta_i_matrix), np.array(I_vs_matrix)
 
@@ -80,9 +82,9 @@ def solve_for_lambda(I_matrix, beta_i_matrix):
     
     #I_matrix, cos_matrix = get_matrixs(panels, alpha)
     print "I_matrix -> ", I_matrix
-    print "cos_matrix -> ", beta_i_matrix
+    print "Beta i matrix -> ", beta_i_matrix
 
-    x = np.linalg.solve(I_matrix, map(cos, beta_i_matrix))
+    x = np.linalg.solve(I_matrix, map(lambda x: cos(x) * (-1), beta_i_matrix))
 
     return x
 
@@ -118,7 +120,7 @@ def get_C_pi(V_i_infi_matrix):
     """
         This will calculate C_pi = 1 - (V_i/V_infinity)**2
     """
-    C_pi_matrix = map(lambda x: 1 - (x)**2, V_i_infi_matrix)
+    C_pi_matrix = map(lambda x: (1 - (x)**2), V_i_infi_matrix)
 
     return C_pi_matrix
 
@@ -143,7 +145,7 @@ def main():
         alpha in degree
         Lambda_norm is lambda/2*pi*V_infinity
     """
-    alpha = -30
+    alpha = 30.0
     a = 20.0
     b = 10.0
     panels = get_panels(a, b, num_panels = 52, plot = False)
@@ -158,7 +160,8 @@ def main():
     C_pi_matrix = get_C_pi(V_i_infi_matrix)
 
     C_l, C_d = get_C_l_and_C_d(a, b, C_pi_matrix, beta_i_matrix, panels)
-    
+   
+    print 'Panels -> ', panels
     print 'I_vs_matrxi -> ', I_vs_matrix
     print 'Values of lambda -> ',lambda_norm
     print 'Len of x -> ', len(lambda_norm)
@@ -169,6 +172,8 @@ def main():
     print 'Sum of lambda -> ', sum_lambda_S
     print 'C_l -> ', C_l
     print 'C_d -> ', C_d
+
+    plot_C_p_vs_x(C_pi_matrix, panels)
 
 if __name__ == "__main__":
     main()
