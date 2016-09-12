@@ -28,7 +28,7 @@ def get_I_ij_or_I_vs(panel_i, panel_j, alpha, which_I):
     phi_i = atan2((panel_i[0][1] - panel_i[1][1]), (panel_i[0][0] - panel_i[1][0]))
     phi_j = atan2((panel_j[0][1] - panel_j[1][1]), (panel_j[0][0] - panel_j[1][0]))
 
-    x_i, y_i = (panel_i[0][0] - panel_i[1][0])/2, (panel_i[0][1] - panel_i[1][1])/2
+    x_i, y_i = (panel_i[0][0] + panel_i[1][0])/2, (panel_i[0][1] + panel_i[1][1])/2
 
     A   = -(x_i - panel_j[1][0])*cos(phi_j) - (y_i - panel_j[1][1])*sin(phi_j)
     B   = (x_i - panel_j[1][0])**2 + (y_i - panel_j[1][1])**2
@@ -202,47 +202,48 @@ def main():
         alpha in degree
         Lambda_norm is lambda/2*pi*V_infinity
     """
-    from read_sp_csv import panels
+    #from read_sp_csv import panels
 
-    alpha = 0
-    a = 1
-    b = 2
-    v_infi = 31
+    alphas_list = [69, -21, 9]
+    a = 20
+    b = 10
+    v_infi = 20
     
-    #panels = get_panels(a, b, num_panels = 24, plot = False)
+    panels = get_panels(a, b, num_panels = 24, plot = False)
 
-    I_matrix, beta_i_matrix, I_vs_matrix_m, I_vs_matrix_c = get_matrixs(panels, alpha)
+    for alpha in alphas_list:
+        I_matrix, beta_i_matrix, I_vs_matrix_m, I_vs_matrix_c = get_matrixs(panels, alpha)
 
-    m_j_matrix, c_j_matrix = solve_for_lambda(I_matrix, beta_i_matrix, v_infi)
+        m_j_matrix, c_j_matrix = solve_for_lambda(I_matrix, beta_i_matrix, v_infi)
     
-    print 'm_j_matrix -> ', m_j_matrix
-    print 'c_j_matrix -> ', c_j_matrix
+    #print 'm_j_matrix -> ', m_j_matrix
+    #print 'c_j_matrix -> ', c_j_matrix
     
-    sum_lambda_S = get_sum_lambda_S(m_j_matrix, c_j_matrix, panels)
-    print 'Sum of lambda -> ', sum_lambda_S
+        sum_lambda_S = get_sum_lambda_S(m_j_matrix, c_j_matrix, panels)
+    #print 'Sum of lambda -> ', sum_lambda_S
     
-    V_i_infi_matrix = get_V_i(I_vs_matrix_m, I_vs_matrix_c, m_j_matrix, c_j_matrix, beta_i_matrix, v_infi) 
+        V_i_infi_matrix = get_V_i(I_vs_matrix_m, I_vs_matrix_c, m_j_matrix, c_j_matrix, beta_i_matrix, v_infi) 
     
-    print 'V_i_infi_matrix ->', V_i_infi_matrix
+    #print 'V_i_infi_matrix ->', V_i_infi_matrix
     
-    C_pi_matrix = get_C_pi(V_i_infi_matrix, v_infi)
+        C_pi_matrix = get_C_pi(V_i_infi_matrix, v_infi)
 
-    C_l, C_d = get_C_l_and_C_d(a, b, C_pi_matrix, beta_i_matrix, panels)
+        C_l, C_d = get_C_l_and_C_d(a, b, C_pi_matrix, beta_i_matrix, panels)
    
-    print 'Panels -> ', panels
-    print 'I_vs_matrix_m -> ', I_vs_matrix_m
-    print 'I_vs_matrix_c -> ', I_vs_matrix_c
+    #print 'Panels -> ', panels
+    #print 'I_vs_matrix_m -> ', I_vs_matrix_m
+    #print 'I_vs_matrix_c -> ', I_vs_matrix_c
     #print 'Values of lambda -> ',lambda_norm
     #print 'Len of x -> ', len(lambda_norm)
-    print 'C_pi_matrix -> ', C_pi_matrix
+    #print 'C_pi_matrix -> ', C_pi_matrix
 
     #sum_lambda_S = get_sum_lambda_S(lambda_norm, panels)
 
-    #print 'Sum of lambda -> ', sum_lambda_S
-    print 'C_l -> ', C_l
-    print 'C_d -> ', C_d
+        print 'Sum of lambda -> ', sum_lambda_S
+        print 'C_l -> ', C_l
+        print 'C_d -> ', C_d
 
-    plot_C_p_vs_x(C_pi_matrix, panels)
+        plot_C_p_vs_x(C_pi_matrix, panels)
     
 if __name__ == "__main__":
     main()
