@@ -145,35 +145,39 @@ def main():
         alpha in degree
         Lambda_norm is lambda/2*pi*V_infinity
     """
-    alpha = 30.0
+    alpha_list = [0, 30.0, -30.0]
     a = 20.0
     b = 10.0
-    panels = get_panels(a, b, num_panels = 52, plot = False)
-    I_matrix, beta_i_matrix, I_vs_matrix = get_matrixs(panels, alpha)
+    num_panels = 52
 
-    lambda_norm = solve_for_lambda(I_matrix, beta_i_matrix)
-
-    V_i_infi_matrix = get_V_i(I_vs_matrix, lambda_norm, beta_i_matrix) 
+    panels = get_panels(a, b, num_panels, plot = False)
     
-    print 'V_i_infi_matrix ->', V_i_infi_matrix
-    
-    C_pi_matrix = get_C_pi(V_i_infi_matrix)
+    for alpha in alpha_list:
+        I_matrix, beta_i_matrix, I_vs_matrix = get_matrixs(panels, alpha)
 
-    C_l, C_d = get_C_l_and_C_d(a, b, C_pi_matrix, beta_i_matrix, panels)
+        lambda_norm = solve_for_lambda(I_matrix, beta_i_matrix)
+
+        V_i_infi_matrix = get_V_i(I_vs_matrix, lambda_norm, beta_i_matrix) 
+    
+        #print 'V_i_infi_matrix ->', V_i_infi_matrix
+    
+        C_pi_matrix = get_C_pi(V_i_infi_matrix)
+
+        C_l, C_d = get_C_l_and_C_d(a, b, C_pi_matrix, beta_i_matrix, panels)
    
-    print 'Panels -> ', panels
-    print 'I_vs_matrxi -> ', I_vs_matrix
-    print 'Values of lambda -> ',lambda_norm
-    print 'Len of x -> ', len(lambda_norm)
-    print 'C_pi_matrix -> ', C_pi_matrix
+    #print 'Panels -> ', panels
+    #print 'I_vs_matrxi -> ', I_vs_matrix
+    #print 'Values of lambda -> ',lambda_norm
+    #print 'Len of x -> ', len(lambda_norm)
+    #print 'C_pi_matrix -> ', C_pi_matrix
 
-    sum_lambda_S = get_sum_lambda_S(lambda_norm, panels)
+        sum_lambda_S = get_sum_lambda_S(lambda_norm, panels)
 
-    print 'Sum of lambda -> ', sum_lambda_S
-    print 'C_l -> ', C_l
-    print 'C_d -> ', C_d
+        print 'Sum of lambda -> ', sum_lambda_S
+        print 'C_l -> ', C_l
+        print 'C_d -> ', C_d
 
-    plot_C_p_vs_x(C_pi_matrix, panels)
+        plot_C_p_vs_x(C_pi_matrix, panels)
 
 if __name__ == "__main__":
     main()
